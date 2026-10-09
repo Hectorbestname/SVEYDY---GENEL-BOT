@@ -339,6 +339,18 @@ const commands = [
       option.setName("sebep")
         .setDescription("Şikâyet sebebi.")
         .setRequired(true)
+    ),
+
+  // YENİ KOMUT: /msg
+  new SlashCommandBuilder()
+    .setName("msg")
+    .setDescription("Bot üzerinden istediğin mesajı gönderir.")
+    .addStringOption(option =>
+      option
+        .setName("message")
+        .setDescription("Gönderilecek mesaj")
+        .setMaxLength(2000)
+        .setRequired(true)
     )
 ].map(command => command.toJSON());
 
@@ -386,7 +398,8 @@ function helpEmbed() {
     "`/oto-rol` — Otomatik rol ayarlar\n" +
     "`/logkanal` — Log kanalını ayarlar\n\n" +
     "**Sahip Komutları**\n" +
-    "`!owner` — Bot sahiplerini gösterir"
+    "`!owner` — Bot sahiplerini gösterir\n" +
+    "`/msg` — Bot üzerinden mesaj gönderir"
   );
 }
 
@@ -868,6 +881,40 @@ client.on("interactionCreate", async interaction => {
         content: "Bu komut bir Discord sunucusunda kullanılmalı.",
         ephemeral: true
       });
+    }
+
+    // ==================== /MSG KOMUTU ====================
+
+    if (commandName === "msg") {
+      if (!isOwner(interaction.user.id)) {
+        return interaction.reply({
+          content: "❌ Bu komutu yalnızca bot sahipleri kullanabilir.",
+          ephemeral: true
+        });
+      }
+
+      const mesaj = interaction.options.getString("message", true);
+
+      try {
+        await interaction.channel.send({
+          content: mesaj,
+          allowedMentions: {
+            parse: ["everyone", "users", "roles"]
+          }
+        });
+
+        return interaction.reply({
+          content: "✅ Mesaj gönderildi!",
+          ephemeral: true
+        });
+      } catch (error) {
+        console.error("/msg gönderim hatası:", error);
+
+        return interaction.reply({
+          content: "❌ Mesaj gönderilemedi. Botun kanal ve etiketleme izinlerini kontrol et.",
+          ephemeral: true
+        });
+      }
     }
 
     // Genel komutlar
