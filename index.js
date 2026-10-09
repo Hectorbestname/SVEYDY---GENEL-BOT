@@ -1,3 +1,4 @@
+
 const {
   Client,
   GatewayIntentBits,
@@ -17,6 +18,18 @@ const {
 
 const fs = require("fs");
 const path = require("path");
+const http = require("http");
+
+// ==================== RENDER HTTP SUNUCUSU ====================
+
+const PORT = process.env.PORT || 3000;
+
+http.createServer((req, res) => {
+  res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
+  res.end("SVEYDY - GENEL BOT aktif!");
+}).listen(PORT, "0.0.0.0", () => {
+  console.log("HTTP sunucusu " + PORT + " portunda aktif.");
+});
 
 // ==================== AYARLAR ====================
 
@@ -332,16 +345,11 @@ const commands = [
 // ==================== BOT AÇILIŞI ====================
 
 client.once("ready", async () => {
-  console.log(`Bot aktif: ${client.user.tag}`);
+  console.log("Bot aktif: " + client.user.tag);
 
   try {
-    if (CLIENT_ID) {
-      await client.application.commands.set(commands);
-      console.log("Slash komutları kaydedildi.");
-    } else {
-      await client.application.commands.set(commands);
-      console.log("Slash komutları kaydedildi. CLIENT_ID ayrıca tanımlanmadı.");
-    }
+    await client.application.commands.set(commands);
+    console.log("Slash komutları kaydedildi.");
   } catch (error) {
     console.error("Slash komutları kaydedilemedi:", error);
   }
@@ -524,7 +532,7 @@ function createTicketModal(type) {
         new TextInputBuilder()
           .setCustomId("trier_meaning")
           .setLabel("TRIER'in nedir?")
-          .setPlaceholder("Örnek:LT3 Sword")
+          .setPlaceholder("Örnek: LT3 Sword")
           .setStyle(TextInputStyle.Paragraph)
           .setRequired(true)
           .setMaxLength(1000)
@@ -731,7 +739,6 @@ client.on("interactionCreate", async interaction => {
       interaction.customId === "ticket_select"
     ) {
       const type = interaction.values[0];
-
       return interaction.showModal(createTicketModal(type));
     }
 
@@ -854,7 +861,14 @@ client.on("interactionCreate", async interaction => {
 
     if (!interaction.isChatInputCommand()) return;
 
-    const { commandName, guild, member } = interaction;
+    const { commandName, guild } = interaction;
+
+    if (!guild) {
+      return interaction.reply({
+        content: "Bu komut bir Discord sunucusunda kullanılmalı.",
+        ephemeral: true
+      });
+    }
 
     // Genel komutlar
     if (commandName === "help") {
@@ -1051,7 +1065,8 @@ client.on("interactionCreate", async interaction => {
     if (commandName === "timeout") {
       const user = interaction.options.getUser("uye");
       const minutes = interaction.options.getInteger("dakika");
-      const reason = interaction.options.getString("sebep") || "Sebep belirtilmedi";
+      const reason =
+        interaction.options.getString("sebep") || "Sebep belirtilmedi";
 
       const target = await guild.members.fetch(user.id).catch(() => null);
 
@@ -1087,7 +1102,8 @@ client.on("interactionCreate", async interaction => {
 
     if (commandName === "kick") {
       const user = interaction.options.getUser("uye");
-      const reason = interaction.options.getString("sebep") || "Sebep belirtilmedi";
+      const reason =
+        interaction.options.getString("sebep") || "Sebep belirtilmedi";
 
       const target = await guild.members.fetch(user.id).catch(() => null);
 
@@ -1122,7 +1138,8 @@ client.on("interactionCreate", async interaction => {
 
     if (commandName === "ban") {
       const user = interaction.options.getUser("uye");
-      const reason = interaction.options.getString("sebep") || "Sebep belirtilmedi";
+      const reason =
+        interaction.options.getString("sebep") || "Sebep belirtilmedi";
 
       const target = await guild.members.fetch(user.id).catch(() => null);
 
@@ -1347,4 +1364,6 @@ process.on("uncaughtException", error => {
 
 // ==================== GİRİŞ ====================
 
-client.login(TOKEN);
+client.login(TOKEN).catch(error => {
+  console.error("Discord giriş hatası:", error);
+});
