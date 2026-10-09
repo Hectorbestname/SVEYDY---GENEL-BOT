@@ -1,4 +1,3 @@
-
 const {
   Client,
   GatewayIntentBits,
@@ -30,6 +29,7 @@ const DEFAULT_APPLICATION_CHANNEL_ID =
   process.env.APPLICATION_CHANNEL_ID?.trim();
 
 const SERVER_IP = "sveydypvp.play.hosting";
+
 const OWNER_IDS = [
   "1262510283092656194",
   "1075321059018027049"
@@ -53,6 +53,7 @@ function loadData(file, fallback = {}) {
     if (!fs.existsSync(fullPath)) {
       fs.writeFileSync(fullPath, JSON.stringify(fallback, null, 2));
     }
+
     return JSON.parse(fs.readFileSync(fullPath, "utf8"));
   } catch (error) {
     console.error(`${file} okunamadı:`, error);
@@ -96,9 +97,11 @@ function makeEmbed(title, description, color = 0x7c3aed) {
 async function sendLog(guild, title, description) {
   const config = guildSettings(guild.id);
   const channelId = config.logChannel || DEFAULT_LOG_CHANNEL_ID;
+
   if (!channelId) return;
 
   const channel = guild.channels.cache.get(channelId);
+
   if (!channel || !channel.isTextBased()) return;
 
   try {
@@ -111,7 +114,10 @@ async function sendLog(guild, title, description) {
 }
 
 async function ephemeral(interaction, message) {
-  const payload = { content: message, ephemeral: true };
+  const payload = {
+    content: message,
+    ephemeral: true
+  };
 
   if (interaction.deferred || interaction.replied) {
     return interaction.followUp(payload);
@@ -149,7 +155,8 @@ const commands = [
     .setName("logkanal")
     .setDescription("Log kanalını ayarlar")
     .addChannelOption(option =>
-      option.setName("kanal")
+      option
+        .setName("kanal")
         .setDescription("Logların gönderileceği kanal")
         .addChannelTypes(ChannelType.GuildText)
         .setRequired(true)
@@ -160,23 +167,48 @@ const commands = [
     .setName("basvurukanal")
     .setDescription("Başvuruların gönderileceği kanalı ayarlar")
     .addChannelOption(option =>
-      option.setName("kanal")
+      option
+        .setName("kanal")
         .setDescription("Başvuru kanalı")
         .addChannelTypes(ChannelType.GuildText)
         .setRequired(true)
     )
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
+  // YENİ: OTOMATİK ROL KOMUTU
+  new SlashCommandBuilder()
+    .setName("oto")
+    .setDescription("Otomatik rol ayarları")
+    .addSubcommandGroup(group =>
+      group
+        .setName("rol")
+        .setDescription("Otomatik rol yönetimi")
+        .addSubcommand(subcommand =>
+          subcommand
+            .setName("ayarla")
+            .setDescription("Yeni üyelere verilecek rolü ayarlar")
+            .addRoleOption(option =>
+              option
+                .setName("member")
+                .setDescription("Yeni üyelere otomatik verilecek rol")
+                .setRequired(true)
+            )
+        )
+    )
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles),
+
   new SlashCommandBuilder()
     .setName("warn")
     .setDescription("Bir kullanıcıya uyarı verir")
     .addUserOption(option =>
-      option.setName("kullanici")
+      option
+        .setName("kullanici")
         .setDescription("Uyarılacak kişi")
         .setRequired(true)
     )
     .addStringOption(option =>
-      option.setName("sebep")
+      option
+        .setName("sebep")
         .setDescription("Uyarı sebebi")
         .setRequired(true)
     )
@@ -186,7 +218,8 @@ const commands = [
     .setName("warnings")
     .setDescription("Kullanıcının uyarılarını gösterir")
     .addUserOption(option =>
-      option.setName("kullanici")
+      option
+        .setName("kullanici")
         .setDescription("Kontrol edilecek kişi")
         .setRequired(true)
     )
@@ -196,19 +229,22 @@ const commands = [
     .setName("timeout")
     .setDescription("Bir kullanıcıyı geçici olarak susturur")
     .addUserOption(option =>
-      option.setName("kullanici")
+      option
+        .setName("kullanici")
         .setDescription("Susturulacak kişi")
         .setRequired(true)
     )
     .addIntegerOption(option =>
-      option.setName("dakika")
+      option
+        .setName("dakika")
         .setDescription("Süre (dakika)")
         .setRequired(true)
         .setMinValue(1)
         .setMaxValue(40320)
     )
     .addStringOption(option =>
-      option.setName("sebep")
+      option
+        .setName("sebep")
         .setDescription("Sebep")
         .setRequired(false)
     )
@@ -218,12 +254,14 @@ const commands = [
     .setName("kick")
     .setDescription("Bir kullanıcıyı sunucudan atar")
     .addUserOption(option =>
-      option.setName("kullanici")
+      option
+        .setName("kullanici")
         .setDescription("Atılacak kişi")
         .setRequired(true)
     )
     .addStringOption(option =>
-      option.setName("sebep")
+      option
+        .setName("sebep")
         .setDescription("Sebep")
         .setRequired(false)
     )
@@ -233,12 +271,14 @@ const commands = [
     .setName("ban")
     .setDescription("Bir kullanıcıyı sunucudan yasaklar")
     .addUserOption(option =>
-      option.setName("kullanici")
+      option
+        .setName("kullanici")
         .setDescription("Yasaklanacak kişi")
         .setRequired(true)
     )
     .addStringOption(option =>
-      option.setName("sebep")
+      option
+        .setName("sebep")
         .setDescription("Sebep")
         .setRequired(false)
     )
@@ -248,7 +288,8 @@ const commands = [
     .setName("clear")
     .setDescription("Kanaldaki mesajları toplu siler")
     .addIntegerOption(option =>
-      option.setName("adet")
+      option
+        .setName("adet")
         .setDescription("Silinecek mesaj sayısı (1-100)")
         .setRequired(true)
         .setMinValue(1)
@@ -270,7 +311,8 @@ const commands = [
     .setName("userinfo")
     .setDescription("Kullanıcı bilgilerini gösterir")
     .addUserOption(option =>
-      option.setName("kullanici")
+      option
+        .setName("kullanici")
         .setDescription("Bilgileri gösterilecek kişi")
         .setRequired(false)
     ),
@@ -279,12 +321,14 @@ const commands = [
     .setName("report")
     .setDescription("Bir üyeyi yetkililere bildirir")
     .addUserOption(option =>
-      option.setName("kullanici")
+      option
+        .setName("kullanici")
         .setDescription("Şikâyet edilen kişi")
         .setRequired(true)
     )
     .addStringOption(option =>
-      option.setName("sebep")
+      option
+        .setName("sebep")
         .setDescription("Şikâyet sebebi")
         .setRequired(true)
     )
@@ -341,6 +385,7 @@ function ticketPanel() {
       .setLabel("Genel Destek")
       .setEmoji("💬")
       .setStyle(ButtonStyle.Primary),
+
     new ButtonBuilder()
       .setCustomId("ticket_report")
       .setLabel("Şikâyet / Oyuncu")
@@ -348,7 +393,10 @@ function ticketPanel() {
       .setStyle(ButtonStyle.Danger)
   );
 
-  return { embeds: [embed], components: [row] };
+  return {
+    embeds: [embed],
+    components: [row]
+  };
 }
 
 async function createTicket(interaction, type) {
@@ -364,7 +412,10 @@ async function createTicket(interaction, type) {
     const existingChannel = guild.channels.cache.get(existing.channelId);
 
     if (existingChannel) {
-      return ephemeral(interaction, `Zaten açık talebin var: ${existingChannel}`);
+      return ephemeral(
+        interaction,
+        `Zaten açık talebin var: ${existingChannel}`
+      );
     }
 
     existing.status = "closed";
@@ -448,7 +499,12 @@ async function createTicket(interaction, type) {
   });
 
   await ephemeral(interaction, `Talebin açıldı: ${channel}`);
-  await sendLog(guild, "🎫 Yeni Ticket", `${interaction.user.tag} → ${channel} (${type})`);
+
+  await sendLog(
+    guild,
+    "🎫 Yeni Ticket",
+    `${interaction.user.tag} → ${channel} (${type})`
+  );
 }
 
 // ==================== BAŞVURU PANELİ ====================
@@ -469,6 +525,7 @@ function applicationPanel() {
       .setLabel("Yetkili Olmak İstiyorum")
       .setEmoji("👮")
       .setStyle(ButtonStyle.Primary),
+
     new ButtonBuilder()
       .setCustomId("application_tester")
       .setLabel("Tester Olmak İstiyorum")
@@ -476,7 +533,10 @@ function applicationPanel() {
       .setStyle(ButtonStyle.Success)
   );
 
-  return { embeds: [embed], components: [row] };
+  return {
+    embeds: [embed],
+    components: [row]
+  };
 }
 
 function makeApplicationModal(type) {
@@ -547,6 +607,7 @@ function makeApplicationModal(type) {
 async function submitApplication(interaction, type) {
   const isStaff = type === "staff";
   const config = guildSettings(interaction.guild.id);
+
   const channelId =
     config.applicationChannel || DEFAULT_APPLICATION_CHANNEL_ID;
 
@@ -588,6 +649,7 @@ async function submitApplication(interaction, type) {
       .setLabel("Kabul Et")
       .setEmoji("✅")
       .setStyle(ButtonStyle.Success),
+
     new ButtonBuilder()
       .setCustomId(`application_reject_${uniqueId}`)
       .setLabel("Reddet")
@@ -595,7 +657,10 @@ async function submitApplication(interaction, type) {
       .setStyle(ButtonStyle.Danger)
   );
 
-  await channel.send({ embeds: [embed], components: [row] });
+  await channel.send({
+    embeds: [embed],
+    components: [row]
+  });
 
   await interaction.reply({
     content: "✅ Başvurun gönderildi! Yetkililer inceleyince sana dönüş yapacak.",
@@ -617,6 +682,77 @@ client.on("interactionCreate", async interaction => {
       const { commandName } = interaction;
       const guild = interaction.guild;
 
+      if (!guild) {
+        return ephemeral(interaction, "Bu komut sunucu içerisinde kullanılmalı.");
+      }
+
+      // ==================== YENİ: OTOMATİK ROL AYARLAMA ====================
+
+      if (commandName === "oto") {
+        if (
+          interaction.options.getSubcommandGroup() === "rol" &&
+          interaction.options.getSubcommand() === "ayarla"
+        ) {
+          const member = await guild.members.fetch(interaction.user.id);
+          const role = interaction.options.getRole("member");
+          const botMember = await guild.members.fetchMe();
+
+          if (!isStaff(member)) {
+            return ephemeral(
+              interaction,
+              "❌ Bu komutu yalnızca yetkililer kullanabilir."
+            );
+          }
+
+          if (
+            !member.permissions.has(PermissionFlagsBits.ManageRoles) &&
+            !member.permissions.has(PermissionFlagsBits.Administrator)
+          ) {
+            return ephemeral(
+              interaction,
+              "❌ Bu komut için Rolleri Yönet yetkisi gerekli."
+            );
+          }
+
+          if (role.id === guild.id || role.managed) {
+            return ephemeral(
+              interaction,
+              "❌ Bu rol otomatik rol olarak kullanılamaz."
+            );
+          }
+
+          if (
+            !botMember.permissions.has(PermissionFlagsBits.ManageRoles)
+          ) {
+            return ephemeral(
+              interaction,
+              "❌ Botta Rolleri Yönet izni yok."
+            );
+          }
+
+          if (role.position >= botMember.roles.highest.position) {
+            return ephemeral(
+              interaction,
+              "❌ Seçilen rol botun en yüksek rolünün altında olmalı. Botun rolünü yukarı taşı."
+            );
+          }
+
+          guildSettings(guild.id).autoRole = role.id;
+          saveData("settings.json", settings);
+
+          await sendLog(
+            guild,
+            "⚙️ Otomatik Rol Ayarlandı",
+            `**Rol:** ${role}\n**Ayarlayan:** ${interaction.user.tag}`
+          );
+
+          return ephemeral(
+            interaction,
+            `✅ Otomatik rol ayarlandı!\nYeni katılan üyelere ${role} rolü verilecek.`
+          );
+        }
+      }
+
       if (commandName === "help") {
         return interaction.reply({
           embeds: [
@@ -624,7 +760,7 @@ client.on("interactionCreate", async interaction => {
               "📘 SVEYDY BOT KOMUTLARI",
               "**Genel:** `/ip`, `/serverinfo`, `/userinfo`, `/help`\n\n" +
               "**Destek ve başvuru:** `/ticketpanel`, `/basvurupanel`\n\n" +
-              "**Yönetim:** `/logkanal`, `/basvurukanal`\n\n" +
+              "**Yönetim:** `/logkanal`, `/basvurukanal`, `/oto rol ayarla`\n\n" +
               "**Moderasyon:** `/warn`, `/warnings`, `/timeout`, `/kick`, `/ban`, `/clear`, `/lock`, `/unlock`\n\n" +
               "**Şikâyet:** `/report`\n\n" +
               "**Sahipleri etiketle:** `!owner`"
@@ -658,6 +794,7 @@ client.on("interactionCreate", async interaction => {
         if (!interaction.memberPermissions.has(PermissionFlagsBits.ManageChannels)) {
           return ephemeral(interaction, "Bu komut için Kanal Yönet izni gerekli.");
         }
+
         await interaction.channel.send(ticketPanel());
         return ephemeral(interaction, "Ticket paneli gönderildi.");
       }
@@ -666,22 +803,33 @@ client.on("interactionCreate", async interaction => {
         if (!interaction.memberPermissions.has(PermissionFlagsBits.ManageChannels)) {
           return ephemeral(interaction, "Bu komut için Kanal Yönet izni gerekli.");
         }
+
         await interaction.channel.send(applicationPanel());
         return ephemeral(interaction, "Başvuru paneli gönderildi.");
       }
 
       if (commandName === "logkanal") {
         const channel = interaction.options.getChannel("kanal");
+
         guildSettings(guild.id).logChannel = channel.id;
         saveData("settings.json", settings);
-        return ephemeral(interaction, `Log kanalı ${channel} olarak ayarlandı.`);
+
+        return ephemeral(
+          interaction,
+          `Log kanalı ${channel} olarak ayarlandı.`
+        );
       }
 
       if (commandName === "basvurukanal") {
         const channel = interaction.options.getChannel("kanal");
+
         guildSettings(guild.id).applicationChannel = channel.id;
         saveData("settings.json", settings);
-        return ephemeral(interaction, `Başvuru kanalı ${channel} olarak ayarlandı.`);
+
+        return ephemeral(
+          interaction,
+          `Başvuru kanalı ${channel} olarak ayarlandı.`
+        );
       }
 
       if (commandName === "warn") {
@@ -698,13 +846,17 @@ client.on("interactionCreate", async interaction => {
         });
 
         saveData("warnings.json", warnings);
+
         await sendLog(
           guild,
           "⚠️ Kullanıcı Uyarıldı",
           `${user.tag} — ${reason}\nYetkili: ${interaction.user.tag}`
         );
 
-        return ephemeral(interaction, `⚠️ ${user.tag} uyarıldı. Sebep: ${reason}`);
+        return ephemeral(
+          interaction,
+          `⚠️ ${user.tag} uyarıldı. Sebep: ${reason}`
+        );
       }
 
       if (commandName === "warnings") {
@@ -718,7 +870,9 @@ client.on("interactionCreate", async interaction => {
           : "Bu kullanıcının kayıtlı uyarısı yok.";
 
         return interaction.reply({
-          embeds: [makeEmbed(`⚠️ ${user.tag} — Uyarılar`, description)],
+          embeds: [
+            makeEmbed(`⚠️ ${user.tag} — Uyarılar`, description)
+          ],
           ephemeral: true
         });
       }
@@ -726,49 +880,108 @@ client.on("interactionCreate", async interaction => {
       if (commandName === "timeout") {
         const user = interaction.options.getUser("kullanici");
         const minutes = interaction.options.getInteger("dakika");
-        const reason = interaction.options.getString("sebep") || "Sebep belirtilmedi";
+        const reason =
+          interaction.options.getString("sebep") || "Sebep belirtilmedi";
+
         const member = await guild.members.fetch(user.id).catch(() => null);
 
-        if (!member) return ephemeral(interaction, "Kullanıcı sunucuda bulunamadı.");
-        if (!member.moderatable) return ephemeral(interaction, "Bu kullanıcıyı susturamıyorum. Rol sıralamasını kontrol et.");
+        if (!member) {
+          return ephemeral(interaction, "Kullanıcı sunucuda bulunamadı.");
+        }
+
+        if (!member.moderatable) {
+          return ephemeral(
+            interaction,
+            "Bu kullanıcıyı susturamıyorum. Rol sıralamasını kontrol et."
+          );
+        }
 
         await member.timeout(minutes * 60 * 1000, reason);
-        await sendLog(guild, "🔇 Timeout", `${user.tag} — ${minutes} dakika\nSebep: ${reason}`);
-        return ephemeral(interaction, `${user.tag}, ${minutes} dakika susturuldu.`);
+
+        await sendLog(
+          guild,
+          "🔇 Timeout",
+          `${user.tag} — ${minutes} dakika\nSebep: ${reason}`
+        );
+
+        return ephemeral(
+          interaction,
+          `${user.tag}, ${minutes} dakika susturuldu.`
+        );
       }
 
       if (commandName === "kick") {
         const user = interaction.options.getUser("kullanici");
-        const reason = interaction.options.getString("sebep") || "Sebep belirtilmedi";
+        const reason =
+          interaction.options.getString("sebep") || "Sebep belirtilmedi";
+
         const member = await guild.members.fetch(user.id).catch(() => null);
 
-        if (!member) return ephemeral(interaction, "Kullanıcı sunucuda bulunamadı.");
-        if (!member.kickable) return ephemeral(interaction, "Bu kullanıcıyı atamıyorum. Rol sıralamasını kontrol et.");
+        if (!member) {
+          return ephemeral(interaction, "Kullanıcı sunucuda bulunamadı.");
+        }
+
+        if (!member.kickable) {
+          return ephemeral(
+            interaction,
+            "Bu kullanıcıyı atamıyorum. Rol sıralamasını kontrol et."
+          );
+        }
 
         await member.kick(reason);
-        await sendLog(guild, "👢 Kullanıcı Atıldı", `${user.tag}\nSebep: ${reason}`);
+
+        await sendLog(
+          guild,
+          "👢 Kullanıcı Atıldı",
+          `${user.tag}\nSebep: ${reason}`
+        );
+
         return ephemeral(interaction, `${user.tag} sunucudan atıldı.`);
       }
 
       if (commandName === "ban") {
         const user = interaction.options.getUser("kullanici");
-        const reason = interaction.options.getString("sebep") || "Sebep belirtilmedi";
+        const reason =
+          interaction.options.getString("sebep") || "Sebep belirtilmedi";
+
         const member = await guild.members.fetch(user.id).catch(() => null);
 
         if (member && !member.bannable) {
-          return ephemeral(interaction, "Bu kullanıcıyı yasaklayamıyorum. Rol sıralamasını kontrol et.");
+          return ephemeral(
+            interaction,
+            "Bu kullanıcıyı yasaklayamıyorum. Rol sıralamasını kontrol et."
+          );
         }
 
         await guild.members.ban(user.id, { reason });
-        await sendLog(guild, "🔨 Kullanıcı Yasaklandı", `${user.tag}\nSebep: ${reason}`);
-        return ephemeral(interaction, `${user.tag} sunucudan yasaklandı.`);
+
+        await sendLog(
+          guild,
+          "🔨 Kullanıcı Yasaklandı",
+          `${user.tag}\nSebep: ${reason}`
+        );
+
+        return ephemeral(
+          interaction,
+          `${user.tag} sunucudan yasaklandı.`
+        );
       }
 
       if (commandName === "clear") {
         const amount = interaction.options.getInteger("adet");
+
         const deleted = await interaction.channel.bulkDelete(amount, true);
-        await sendLog(guild, "🧹 Mesajlar Silindi", `${interaction.user.tag}, ${interaction.channel} kanalında ${deleted.size} mesaj sildi.`);
-        return ephemeral(interaction, `${deleted.size} mesaj silindi. 14 günden eski mesajlar toplu silinemez.`);
+
+        await sendLog(
+          guild,
+          "🧹 Mesajlar Silindi",
+          `${interaction.user.tag}, ${interaction.channel} kanalında ${deleted.size} mesaj sildi.`
+        );
+
+        return ephemeral(
+          interaction,
+          `${deleted.size} mesaj silindi. 14 günden eski mesajlar toplu silinemez.`
+        );
       }
 
       if (commandName === "lock" || commandName === "unlock") {
@@ -785,11 +998,16 @@ client.on("interactionCreate", async interaction => {
           `${interaction.channel} — ${interaction.user.tag}`
         );
 
-        return ephemeral(interaction, locked ? "Kanal kilitlendi." : "Kanal kilidi kaldırıldı.");
+        return ephemeral(
+          interaction,
+          locked ? "Kanal kilitlendi." : "Kanal kilidi kaldırıldı."
+        );
       }
 
       if (commandName === "userinfo") {
-        const user = interaction.options.getUser("kullanici") || interaction.user;
+        const user =
+          interaction.options.getUser("kullanici") || interaction.user;
+
         const member = await guild.members.fetch(user.id).catch(() => null);
 
         const roles = member
@@ -818,12 +1036,18 @@ client.on("interactionCreate", async interaction => {
       if (commandName === "report") {
         const user = interaction.options.getUser("kullanici");
         const reason = interaction.options.getString("sebep");
+
         const config = guildSettings(guild.id);
         const logId = config.logChannel || DEFAULT_LOG_CHANNEL_ID;
-        const logChannel = logId ? guild.channels.cache.get(logId) : null;
+        const logChannel = logId
+          ? guild.channels.cache.get(logId)
+          : null;
 
         if (!logChannel || !logChannel.isTextBased()) {
-          return ephemeral(interaction, "Şikâyet kanalı ayarlanmamış. Yönetici /logkanal kullanmalı.");
+          return ephemeral(
+            interaction,
+            "Şikâyet kanalı ayarlanmamış. Yönetici /logkanal kullanmalı."
+          );
         }
 
         await logChannel.send({
@@ -838,15 +1062,25 @@ client.on("interactionCreate", async interaction => {
           ]
         });
 
-        return ephemeral(interaction, "Şikâyetin yetkililere iletildi.");
+        return ephemeral(
+          interaction,
+          "Şikâyetin yetkililere iletildi."
+        );
       }
     }
+
+    // ==================== BUTONLAR ====================
 
     if (interaction.isButton()) {
       const id = interaction.customId;
 
-      if (id === "ticket_general") return createTicket(interaction, "general");
-      if (id === "ticket_report") return createTicket(interaction, "report");
+      if (id === "ticket_general") {
+        return createTicket(interaction, "general");
+      }
+
+      if (id === "ticket_report") {
+        return createTicket(interaction, "report");
+      }
 
       if (id === "application_staff") {
         return interaction.showModal(makeApplicationModal("staff"));
@@ -868,12 +1102,16 @@ client.on("interactionCreate", async interaction => {
           ticket.userId !== interaction.user.id &&
           !isStaff(interaction.member)
         ) {
-          return ephemeral(interaction, "Bu ticketı yalnızca açan kişi veya yetkili kapatabilir.");
+          return ephemeral(
+            interaction,
+            "Bu ticketı yalnızca açan kişi veya yetkili kapatabilir."
+          );
         }
 
         ticket.status = "closed";
         ticket.closedAt = Date.now();
         ticket.closedBy = interaction.user.id;
+
         saveData("tickets.json", tickets);
 
         await interaction.reply({
@@ -893,7 +1131,10 @@ client.on("interactionCreate", async interaction => {
 
         setTimeout(async () => {
           const channel = interaction.guild.channels.cache.get(channelId);
-          if (channel) await channel.delete("Ticket kapatıldı").catch(() => {});
+
+          if (channel) {
+            await channel.delete("Ticket kapatıldı").catch(() => {});
+          }
         }, 5000);
 
         return;
@@ -904,20 +1145,27 @@ client.on("interactionCreate", async interaction => {
         id.startsWith("application_reject_")
       ) {
         if (!isStaff(interaction.member)) {
-          return ephemeral(interaction, "Bu butonları yalnızca yetkililer kullanabilir.");
+          return ephemeral(
+            interaction,
+            "Bu butonları yalnızca yetkililer kullanabilir."
+          );
         }
 
         const accepted = id.startsWith("application_accept_");
         const applicantId = id.split("_")[2];
 
         const originalEmbed = interaction.message.embeds[0];
+
         const updatedEmbed = originalEmbed
           ? EmbedBuilder.from(originalEmbed)
               .setColor(accepted ? 0x57f287 : 0xed4245)
               .setFooter({
                 text: `${accepted ? "KABUL EDİLDİ" : "REDDEDİLDİ"} • ${interaction.user.tag}`
               })
-          : makeEmbed("Başvuru Sonucu", accepted ? "Kabul edildi." : "Reddedildi.");
+          : makeEmbed(
+              "Başvuru Sonucu",
+              accepted ? "Kabul edildi." : "Reddedildi."
+            );
 
         const disabledRows = interaction.message.components.map(row =>
           new ActionRowBuilder().addComponents(
@@ -932,7 +1180,9 @@ client.on("interactionCreate", async interaction => {
           components: disabledRows
         });
 
-        const applicant = await client.users.fetch(applicantId).catch(() => null);
+        const applicant = await client.users
+          .fetch(applicantId)
+          .catch(() => null);
 
         if (applicant) {
           await applicant.send(
@@ -949,6 +1199,8 @@ client.on("interactionCreate", async interaction => {
         );
       }
     }
+
+    // ==================== BAŞVURU FORMLARI ====================
 
     if (interaction.isModalSubmit()) {
       if (interaction.customId === "application_modal_staff") {
@@ -971,7 +1223,7 @@ client.on("interactionCreate", async interaction => {
   }
 });
 
-// ==================== MESAJ VE ÜYE LOGLARI ====================
+// ==================== MESAJ LOGLARI ====================
 
 client.on("messageDelete", async message => {
   if (!message.guild || message.author?.bot) return;
@@ -999,12 +1251,56 @@ client.on("messageUpdate", async (oldMessage, newMessage) => {
   );
 });
 
+// ==================== YENİ ÜYE VE OTOMATİK ROL ====================
+
 client.on("guildMemberAdd", async member => {
-  await sendLog(member.guild, "📥 Yeni Üye", `${member.user.tag} sunucuya katıldı.`);
+  const config = guildSettings(member.guild.id);
+  const roleId = config.autoRole;
+
+  if (roleId) {
+    try {
+      const role = await member.guild.roles.fetch(roleId);
+      const botMember = await member.guild.members.fetchMe();
+
+      if (!role) {
+        console.error(
+          "❌ Otomatik rol bulunamadı. Rol silinmiş veya silinmiş olabilir."
+        );
+      } else if (
+        !botMember.permissions.has(PermissionFlagsBits.ManageRoles)
+      ) {
+        console.error("❌ Botta Rolleri Yönet izni yok.");
+      } else if (
+        role.position >= botMember.roles.highest.position
+      ) {
+        console.error(
+          "❌ Otomatik rol botun en yüksek rolünün altında olmalı."
+        );
+      } else {
+        await member.roles.add(role, "Otomatik üye rolü");
+
+        console.log(
+          `✅ ${member.user.tag} kullanıcısına ${role.name} rolü verildi.`
+        );
+      }
+    } catch (error) {
+      console.error("❌ Otomatik rol verilemedi:", error);
+    }
+  }
+
+  await sendLog(
+    member.guild,
+    "📥 Yeni Üye",
+    `${member.user.tag} sunucuya katıldı.`
+  );
 });
 
 client.on("guildMemberRemove", async member => {
-  await sendLog(member.guild, "📤 Üye Ayrıldı", `${member.user.tag} sunucudan ayrıldı.`);
+  await sendLog(
+    member.guild,
+    "📤 Üye Ayrıldı",
+    `${member.user.tag} sunucudan ayrıldı.`
+  );
 });
 
 // ==================== !ip VE !owner ====================
@@ -1034,10 +1330,16 @@ client.on("messageCreate", async message => {
   }
 });
 
-client.on("error", error => console.error("Discord client hatası:", error));
+// ==================== HATA YÖNETİMİ ====================
+
+client.on("error", error => {
+  console.error("Discord client hatası:", error);
+});
 
 process.on("unhandledRejection", error => {
   console.error("İşlenmeyen hata:", error);
 });
+
+// ==================== BOTU BAŞLAT ====================
 
 client.login(TOKEN);
