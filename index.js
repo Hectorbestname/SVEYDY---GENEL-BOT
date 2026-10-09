@@ -524,7 +524,7 @@ function createTicketModal(type) {
         new TextInputBuilder()
           .setCustomId("trier_meaning")
           .setLabel("TRIER'in nedir?")
-          .setPlaceholder("TRIER hakkında ne biliyorsun?")
+          .setPlaceholder("Örnek:LT3 Sword")
           .setStyle(TextInputStyle.Paragraph)
           .setRequired(true)
           .setMaxLength(1000)
@@ -552,7 +552,7 @@ function createTicketModal(type) {
         new TextInputBuilder()
           .setCustomId("requested_role")
           .setLabel("Hangi yetkili rolünü istiyorsun?")
-          .setPlaceholder("Örnek: Moderatör")
+          .setPlaceholder("Örnek: Rehber")
           .setStyle(TextInputStyle.Short)
           .setRequired(true)
           .setMaxLength(100)
@@ -1249,7 +1249,7 @@ client.on("messageCreate", async message => {
     return message.reply({
       embeds: [
         makeEmbed(
-          "👑 Bot Sahipleri",
+          "👑 Sunucu Sahipleri",
           OWNER_IDS.map(id => `<@${id}>`).join("\n")
         )
       ]
